@@ -14,22 +14,27 @@
       const { useState } = React;
       const {useRef} = React;
 
-function Rating () {
+function Rating ({rating}) {
+  const maxRating = 5;
   return (
-    <div> ★★★★ </div>
-  )
-}
+    <div>
+         {[...Array(maxRating)].map((_, i) => (
+           <span key={i}>{i < rating ? '★' : '☆'}</span>
+         ))}
+       </div>
+     );
+   }
 
-function Card () {
+function Card ({name, price, rating}) {
   return (
     <div className="col">
       <div className="card">
         <img src="..." className="card-img-top" alt="..."/>
         <div className="card-body">
-          <h5 className="card-title">Card title</h5>
-          <Rating/>
-          <h5 className="card-title">Price</h5>
-          <div class="d-grid gap-2">
+          <h5 className="card-title"> {name} </h5>
+          <Rating rating={rating}/>
+          <h5 className="card-title"> {price} </h5>
+          <div className="d-grid gap-2">
             <button type="button" className="btn btn-success">Add</button>
           </div>
         </div>
@@ -39,26 +44,61 @@ function Card () {
 }
 
 function ItemList () {
+  let items = [
+    {id:1, name:'Dracula', price:'20 pln', rating:5},
+    {id:2, name: 'Frankenstein', price: '35 pln', rating:4},
+    {id:3, name: 'Carmilla', price: '37 pln', rating:4},
+    {id:4, name: 'Vampire Hunter D', price: '36 pln', rating:4.5},
+    {id:5, name: 'Call of Ctulhu', price: '42 pln', rating:4.2},
+    {id:6, name: 'Interview with Vampire', price: '39 pln', rating:4.3}
+  ];
   return (
-    <div className="row row-cols-1 row-cols-md-4 g-4">
-      <Card/>
-      <Card/>
-      <Card/>
-      <Card/>
-      <Card/>
+    <div className="col-8">
+      <div className="row row-cols-1 row-cols-md-3 g-4 p-3 border bg-light">
+        {items.map((item) => (
+          <Card
+            key={item.id}
+            name={item.name}
+            price={item.price}
+            rating={item.rating}
+          />
+        ))}
+      </div>
     </div>
   )
 }
 
 function Cart () {
   return (
-<div> </div>
+    <div className="col-4">
+      <div className="p-3 border bg-light">
+        <p className = "text-center"><strong>99,99</strong></p>
+        <div className="d-grid gap-2">
+          <button type="button" className="btn btn-success"> Go to checkout </button>
+        </div>
+        <div className="d-grid gap-2 mt-2">
+          <button type="button" className="btn btn-primary"> Go to cart </button>
+        </div>
+        <div className="d-flex justify-content-center align-items-center">
+          <div className="form-check">
+            <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+            <label className="form-check-label" htmlFor ="flexCheckDefault">
+              Select all
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
   )
 }
 
 function MyApp() {
   return (
+    <div className="row">
     <ItemList/>
+    <Cart/>
+    </div>
   )
 }
 
