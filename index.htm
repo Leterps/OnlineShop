@@ -42,7 +42,7 @@ function Card ({name, price, rating, onAdd}) {
   )
 }
 
-function CardShort ({name, price}) {
+function CardShort ({name, price, onDelete}) {
   return (
       <div className="card w-100 mb-3">
         <div className="card-body">
@@ -59,6 +59,7 @@ function CardShort ({name, price}) {
               type="button"
               className="btn-close ms-auto"
               aria-label="Close"
+              onClick = {onDelete}
             ></button>
           </div>
             <h5 className="card-title"> {name} </h5>
@@ -86,7 +87,7 @@ function ItemList ({items, onAddItem}) {
   )
 }
 
-function Cart ({items}) {
+function Cart ({items, onDeleteItem}) {
   return (
     <div className="col-2">
       <div className="p-3 border bg-light">
@@ -107,6 +108,7 @@ function Cart ({items}) {
                 key={item.id}
                 name={item.name}
                 price={item.price}
+                onDelete= {() => onDeleteItem(item)}
               />
             ))}
             </div>
@@ -126,16 +128,21 @@ function MyApp() {
     {id:6, name: 'Interview with Vampire', price: '39 pln', rating:4.3}
   ];
 
-  let [cartItems, setItems] = useState ([{id:1, name:'Dracula', price:'20 pln', rating:5}]);
+  let [cartItems, setItems] = useState ([]);
   function addItem(item) {
     if (!cartItems.some((cartItem) => cartItem.id === item.id)) {
       setItems ([...cartItems, item]);
     }
   }
+
+  function deleteItem(item) {
+    setItems(cartItems.filter((cartItem) => cartItem.id !== item.id));
+  }
+
   return (
     <div className="row">
     <ItemList items = {items} onAddItem={addItem}/>
-    <Cart items = {cartItems}/>
+    <Cart items = {cartItems} onDeleteItem={deleteItem}/>
     </div>
   )
 }
