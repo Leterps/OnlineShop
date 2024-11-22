@@ -42,19 +42,36 @@ function Card ({name, price, rating, onAdd}) {
   )
 }
 
+function CounterNav() {
+  return (
+    <div
+      className="d-flex justify-content-center align-items-center bg-light p-2 rounded"
+      style={{ maxWidth: "300px", margin: "auto" }}
+    >
+      <button className="btn btn-outline-primary" type="button">
+        <span aria-hidden="true">&laquo;</span>
+      </button>
+      <span className="mx-3 text-center" style={{ minWidth: "50px" }}>5</span>
+      <button className="btn btn-outline-primary" type="button">
+        <span aria-hidden="true">&raquo;</span>
+      </button>
+    </div>
+  );
+}
+
 function CardShort ({name, price, onDelete}) {
   return (
       <div className="card w-100 mb-3">
         <div className="card-body">
           <div className="d-flex">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="radioNoLabel"
-              id="radioNoLabel1"
-              value=""
-              aria-label="..."
-            />
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                id="flexCheckDefault"
+              />
+            </div>
             <button
               type="button"
               className="btn-close ms-auto"
@@ -64,6 +81,7 @@ function CardShort ({name, price, onDelete}) {
           </div>
             <h5 className="card-title"> {name} </h5>
             <h5 className="card-title"> {price} </h5>
+            <CounterNav/>
         </div>
       </div>
   )
@@ -138,11 +156,16 @@ function MyApp() {
   function deleteItem(item) {
     setItems(cartItems.filter((cartItem) => cartItem.id !== item.id));
   }
-
+  let [itemsCount, setItemsCount] = useState (0);
+  function countSelectedItems(item) {
+    if (cartItems.length>0) {
+      setItemsCount (cartItems.length);
+    }
+  }
   return (
     <div className="row">
     <ItemList items = {items} onAddItem={addItem}/>
-    <Cart items = {cartItems} onDeleteItem={deleteItem}/>
+    <Cart items = {cartItems} onDeleteItem={deleteItem} countSelectedItems={countSelectedItems}/>
     </div>
   )
 }
