@@ -26,6 +26,10 @@ function Rating ({rating}) {
    }
 
 function Card ({name, price, rating, onAdd}) {
+  const [showBar, setShowBar] = useState(false);
+  function openBar () {
+    setShowBar(true);
+  }
   return (
     <div className="col">
       <div className="card">
@@ -34,7 +38,11 @@ function Card ({name, price, rating, onAdd}) {
           <Rating rating={rating}/>
           <h5 className="card-title"> {price} </h5>
           <div className="d-grid gap-2">
-            <button onClick={onAdd} type="button" className="btn btn-success">Add</button>
+          {showBar ?
+            <CounterNav/>
+          :
+            <button onClick={() => { onAdd(); openBar()}} type="button" className="btn btn-success">Add</button>
+          }
           </div>
         </div>
       </div>
@@ -43,21 +51,50 @@ function Card ({name, price, rating, onAdd}) {
 }
 
 function CounterNav() {
-  return (
-    <div
-      className="d-flex justify-content-center align-items-center bg-light p-2 rounded"
-      style={{ maxWidth: "300px", margin: "auto" }}
-    >
-      <button className="btn btn-outline-primary" type="button">
-        <span aria-hidden="true">&laquo;</span>
-      </button>
-      <span className="mx-3 text-center" style={{ minWidth: "50px" }}>5</span>
-      <button className="btn btn-outline-primary" type="button">
-        <span aria-hidden="true">&raquo;</span>
-      </button>
-    </div>
-  );
-}
+  const [inputNumber, setInputNumber] = useState(0);
+  function handleChange(e) {
+    setInputNumber(Number(e.target.value));
+  }
+  function addItem () {
+    setInputNumber((prev) => prev + 1);
+  }
+  function subtractItem() {
+    if (inputNumber>0) {
+      setInputNumber((prev) => prev - 1);
+    }
+    else {
+      setInputNumber(0);
+    }
+  }
+    return (
+      <div
+        className="d-flex justify-content-between align-items-center bg-light p-2 rounded w-100 py-1"
+        style={{ maxWidth: "100%" }}
+
+      >
+        <button
+          className="btn btn-outline-primary btn-sm"
+          type="button" onClick={subtractItem}
+        >
+          <span aria-hidden="true">-</span>
+        </button>
+        <input
+           type="number"
+           className="form-control form-control-sm text-center mx-2"
+           style={{ width: "60px" }}
+           onChange={handleChange}
+           value = {inputNumber}
+         />
+        <button
+          className="btn btn-outline-primary btn-sm"
+          type="button"
+          onClick = {addItem}
+        >
+          <span aria-hidden="true">+</span>
+        </button>
+      </div>
+    );
+  }
 
 function CardShort ({name, price, onDelete}) {
   return (
@@ -90,7 +127,7 @@ function CardShort ({name, price, onDelete}) {
 function ItemList ({items, onAddItem}) {
   return (
     <div className="col-10">
-      <div className="row row-cols-1 row-cols-md-3 g-4 p-3 border bg-light">
+      <div className="row row-cols-1 row-cols-md-5 g-4 p-3 border bg-light">
         {items.map((item) => (
           <Card
             key={item.id}
