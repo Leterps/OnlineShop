@@ -25,31 +25,95 @@ function Rating ({rating}) {
      );
    }
 
-function Card ({name, price, rating, onAdd, onDelete}) {
-  const [showBar, setShowBar] = useState(false);
-  function openBar () {
-    setShowBar(true);
+function CounterNav({itemId, quantity, onQuantityChange, onDelete}) {
+  function confirmAndDelete() {
+    if (confirm("Are you sure you want to delete this item?")) {
+      onDelete();
+    }
   }
+
+  function handleChange(e) {
+    const value = Number(e.target.value);
+    if (value < 1) {
+      confirmAndDelete();
+    } else {
+      onQuantityChange(itemId, value);
+    }
+  }
+
+  function addItem() {
+    onQuantityChange(itemId, quantity + 1);
+  }
+
+  function subtractItem() {
+    if (quantity > 1) {
+      onQuantityChange(itemId, quantity - 1);
+    } else {
+      confirmAndDelete();
+    }
+  }
+
+  return (
+    <div
+      className="d-flex justify-content-between align-items-center bg-light p-2 rounded w-100 py-1"
+      style={{ maxWidth: "100%" }}
+    >
+      <button
+        className="btn btn-outline-primary btn-sm"
+        type="button"
+        onClick={subtractItem}
+      >
+        <span aria-hidden="true">-</span>
+      </button>
+      <input
+         type="number"
+         className="form-control form-control-sm text-center mx-2"
+         style={{ width: "60px" }}
+         onChange={handleChange}
+         value={quantity}
+       />
+      <button
+        className="btn btn-outline-primary btn-sm"
+        type="button"
+        onClick={addItem}
+      >
+        <span aria-hidden="true">+</span>
+      </button>
+    </div>
+  );
+}
+
+function Card({name, price, rating, item, onAdd, onDelete, quantity, onQuantityChange}) {
+  const [showBar, setShowBar] = useState(false);
+
+  function openBar() {
+    setShowBar(true);
+    onAdd();
+  }
+
   function closeBar() {
     setShowBar(false);
     onDelete();
   }
+
   return (
     <div className="col">
       <div className="card">
         <div className="card-body">
-          <h5 className="card-title"> {name} </h5>
+          <h5 className="card-title">{name}</h5>
           <Rating rating={rating}/>
-          <h5 className="card-title"> {price} </h5>
+          <h5 className="card-title">{price}</h5>
           <div className="d-grid gap-2">
           {showBar ? (
-            <CounterNav onDelete={closeBar} />
+            <CounterNav
+              itemId={item.id}
+              quantity={quantity}
+              onQuantityChange={onQuantityChange}
+              onDelete={closeBar}
+            />
           ) : (
             <button
-              onClick={() => {
-                onAdd();
-                openBar();
-                }}
+              onClick={openBar}
               type="button"
               className="btn btn-success"
             >
@@ -63,92 +127,40 @@ function Card ({name, price, rating, onAdd, onDelete}) {
   )
 }
 
-function CounterNav({onDelete}) {
-  const [inputNumber, setInputNumber] = useState(1);
-
-  function confirmAndDelete() {
-    if (confirm("Are you sure you want to delete this item?")) {
-      onDelete();
-    }
-  }
-
-  function handleChange(e) {
-    const value = Number(e.target.value);
-    setInputNumber(value < 1 ? 0 : value);
-     if (value < 1) {
-       confirmAndDelete();
-     }
-  }
-
-  function addItem () {
-    setInputNumber((prev) => prev + 1);
-  }
-  function subtractItem() {
-    if (inputNumber>1) {
-      setInputNumber((prev) => prev - 1);
-    }  else {
-      confirmAndDelete();
-    }
-  }
-    return (
-      <div
-        className="d-flex justify-content-between align-items-center bg-light p-2 rounded w-100 py-1"
-        style={{ maxWidth: "100%" }}
-
-      >
-        <button
-          className="btn btn-outline-primary btn-sm"
-          type="button" onClick={subtractItem}
-        >
-          <span aria-hidden="true">-</span>
-        </button>
-        <input
-           type="number"
-           className="form-control form-control-sm text-center mx-2"
-           style={{ width: "60px" }}
-           onChange={handleChange}
-           value = {inputNumber}
-         />
-        <button
-          className="btn btn-outline-primary btn-sm"
-          type="button"
-          onClick = {addItem}
-        >
-          <span aria-hidden="true">+</span>
-        </button>
-      </div>
-    );
-  }
-
-function CardShort ({name, price, onDelete}) {
+function CardShort({name, price, item, onDelete, quantity, onQuantityChange}) {
   return (
-      <div className="card w-100 mb-3">
-        <div className="card-body">
-          <div className="d-flex">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                value=""
-                id="flexCheckDefault"
-              />
-            </div>
-            <button
-              type="button"
-              className="btn-close ms-auto"
-              aria-label="Close"
-              onClick = {onDelete}
-            ></button>
+    <div className="card w-100 mb-3">
+      <div className="card-body">
+        <div className="d-flex">
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              value=""
+              id="flexCheckDefault"
+            />
           </div>
-            <h5 className="card-title"> {name} </h5>
-            <h5 className="card-title"> {price} </h5>
-            <CounterNav onDelete={onDelete}/>
+          <button
+            type="button"
+            className="btn-close ms-auto"
+            aria-label="Close"
+            onClick={onDelete}
+          ></button>
         </div>
+        <h5 className="card-title">{name}</h5>
+        <h5 className="card-title">{price}</h5>
+        <CounterNav
+          itemId={item.id}
+          quantity={quantity}
+          onQuantityChange={onQuantityChange}
+          onDelete={onDelete}
+        />
       </div>
+    </div>
   )
 }
 
-function ItemList ({items, onAddItem, onDeleteItem}) {
+function ItemList({items, cartItems, quantities, onAddItem, onDeleteItem, onQuantityChange}) {
   return (
     <div className="col-10">
       <div className="row row-cols-1 row-cols-md-5 g-4 p-3 border bg-light">
@@ -158,8 +170,11 @@ function ItemList ({items, onAddItem, onDeleteItem}) {
             name={item.name}
             price={item.price}
             rating={item.rating}
+            item={item}
+            quantity={quantities[item.id] || 1}
             onAdd={() => onAddItem(item)}
             onDelete={() => onDeleteItem(item)}
+            onQuantityChange={onQuantityChange}
           />
         ))}
       </div>
@@ -167,39 +182,41 @@ function ItemList ({items, onAddItem, onDeleteItem}) {
   )
 }
 
-function Cart ({items, onDeleteItem}) {
+function Cart({items, quantities, onDeleteItem, onQuantityChange}) {
   return (
     <div className="col-2">
       <div className="p-3 border bg-light">
-        <p className = "text-center"><strong>99,99</strong></p>
+        <p className="text-center"><strong>99,99</strong></p>
         <div className="d-grid gap-2">
-          <button type="button" className="btn btn-success"> Go to checkout </button>
+          <button type="button" className="btn btn-success">Go to checkout</button>
         </div>
         <div className="d-grid gap-2 mt-2">
-          <button type="button" className="btn btn-primary"> Go to cart </button>
+          <button type="button" className="btn btn-primary">Go to cart</button>
         </div>
-            <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-            <label className="form-check-label" htmlFor ="flexCheckDefault">
-              Select all
-            </label>
-            <div className="d-flex flex-column align-items-center">
-            {items.map((item) => (
-              <CardShort
-                key={item.id}
-                name={item.name}
-                price={item.price}
-                onDelete= {() => onDeleteItem(item)}
-              />
-            ))}
-            </div>
+        <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+        <label className="form-check-label" htmlFor="flexCheckDefault">
+          Select all
+        </label>
+        <div className="d-flex flex-column align-items-center">
+          {items.map((item) => (
+            <CardShort
+              key={item.id}
+              name={item.name}
+              price={item.price}
+              item={item}
+              quantity={quantities[item.id] || 1}
+              onDelete={() => onDeleteItem(item)}
+              onQuantityChange={onQuantityChange}
+            />
+          ))}
+        </div>
       </div>
     </div>
-
   )
 }
 
 function MyApp() {
-  let items = [
+  const items = [
     {id:1, name:'Dracula', price:'20 pln', rating:5},
     {id:2, name: 'Frankenstein', price: '35 pln', rating:4},
     {id:3, name: 'Carmilla', price: '37 pln', rating:4},
@@ -208,26 +225,45 @@ function MyApp() {
     {id:6, name: 'Interview with Vampire', price: '39 pln', rating:4.3}
   ];
 
-  let [cartItems, setItems] = useState ([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [quantities, setQuantities] = useState({});
+
   function addItem(item) {
     if (!cartItems.some((cartItem) => cartItem.id === item.id)) {
-      setItems ([...cartItems, item]);
+      setCartItems([...cartItems, item]);
+      setQuantities(prev => ({...prev, [item.id]: 1}));
     }
   }
 
   function deleteItem(item) {
-    setItems(cartItems.filter((cartItem) => cartItem.id !== item.id));
+    setCartItems(cartItems.filter((cartItem) => cartItem.id !== item.id));
+    setQuantities(prev => {
+      const newQuantities = {...prev};
+      delete newQuantities[item.id];
+      return newQuantities;
+    });
   }
-  let [itemsCount, setItemsCount] = useState (0);
-  function countSelectedItems(item) {
-    if (cartItems.length>0) {
-      setItemsCount (cartItems.length);
-    }
+
+  function updateQuantity(itemId, newQuantity) {
+    setQuantities(prev => ({...prev, [itemId]: newQuantity}));
   }
+
   return (
     <div className="row">
-    <ItemList items = {items} onAddItem={addItem} onDeleteItem={deleteItem}/>
-    <Cart items = {cartItems} onDeleteItem={deleteItem} countSelectedItems={countSelectedItems}/>
+      <ItemList
+        items={items}
+        cartItems={cartItems}
+        quantities={quantities}
+        onAddItem={addItem}
+        onDeleteItem={deleteItem}
+        onQuantityChange={updateQuantity}
+      />
+      <Cart
+        items={cartItems}
+        quantities={quantities}
+        onDeleteItem={deleteItem}
+        onQuantityChange={updateQuantity}
+      />
     </div>
   )
 }
