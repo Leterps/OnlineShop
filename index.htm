@@ -13,6 +13,7 @@
     <script type="text/babel">
       const { useState } = React;
       const {useRef} = React;
+      const {useEffect} = React;
 
 function Rating ({rating}) {
   const maxRating = 5;
@@ -116,7 +117,7 @@ function Card({name, price, rating, item, onAdd, onDelete, quantity, onQuantityC
         <div className="card-body">
           <h5 className="card-title">{name}</h5>
           <Rating rating={rating}/>
-          <h5 className="card-title">{price}</h5>
+          <h5 className="card-title">{price} PLN </h5>
           <div className="d-grid gap-2">
           {showBar ? (
             <CounterNav
@@ -142,6 +143,9 @@ function Card({name, price, rating, item, onAdd, onDelete, quantity, onQuantityC
 }
 
 function CardShort({name, price, item, onDelete, quantity, onQuantityChange}) {
+
+  const totalPrice = price * quantity;
+
   return (
     <div className="card w-100 mb-3">
       <div className="card-body">
@@ -162,7 +166,7 @@ function CardShort({name, price, item, onDelete, quantity, onQuantityChange}) {
           ></button>
         </div>
         <h5 className="card-title">{name}</h5>
-        <h5 className="card-title">{price}</h5>
+        <h5 className="card-title">{totalPrice} PLN </h5>
         <CounterNav
           itemId={item.id}
           quantity={quantity}
@@ -231,12 +235,12 @@ function Cart({items, quantities, onDeleteItem, onQuantityChange}) {
 
 function MyApp() {
   const items = [
-    {id:1, name:'Dracula', price:'20 pln', rating:5},
-    {id:2, name: 'Frankenstein', price: '35 pln', rating:4},
-    {id:3, name: 'Carmilla', price: '37 pln', rating:4},
-    {id:4, name: 'Vampire Hunter D', price: '36 pln', rating:4.5},
-    {id:5, name: 'Call of Ctulhu', price: '42 pln', rating:4.2},
-    {id:6, name: 'Interview with Vampire', price: '39 pln', rating:4.3}
+    {id:1, name:'Dracula', price:20, rating:5},
+    {id:2, name: 'Frankenstein', price: 35, rating:4},
+    {id:3, name: 'Carmilla', price: 3, rating:4},
+    {id:4, name: 'Vampire Hunter D', price: 36, rating:4.5},
+    {id:5, name: 'Call of Ctulhu', price: 42, rating:4.2},
+    {id:6, name: 'Interview with Vampire', price: 39, rating:4.3}
   ];
 
   const [cartItems, setCartItems] = useState([]);
