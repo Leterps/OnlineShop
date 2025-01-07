@@ -26,20 +26,43 @@ function Rating ({rating}) {
    }
 
 function CounterNav({itemId, quantity, onQuantityChange, onDelete}) {
+
+  const [inputValue, setInputValue] = useState(quantity.toString());
+
+  React.useEffect(() => {
+     setInputValue(quantity.toString());
+   }, [quantity]);
+
   function confirmAndDelete() {
     if (confirm("Are you sure you want to delete this item?")) {
       onDelete();
     }
   }
 
+
   function handleChange(e) {
-    const value = Number(e.target.value);
-    if (value < 1) {
-      confirmAndDelete();
-    } else {
-      onQuantityChange(itemId, value);
+      const newValue = e.target.value;
+      setInputValue(newValue);
+
+      if (newValue === '') {
+        return;
+      }
+
+      const numericValue = Number(newValue);
+      if (!isNaN(numericValue)) {
+        if (numericValue < 1) {
+          confirmAndDelete();
+        } else {
+          onQuantityChange(itemId, numericValue);
+        }
+      }
     }
-  }
+
+    function handleBlur() {
+        if (inputValue === '' || isNaN(Number(inputValue))) {
+          setInputValue(quantity.toString());
+        }
+      }
 
   function addItem() {
     onQuantityChange(itemId, quantity + 1);
@@ -70,7 +93,8 @@ function CounterNav({itemId, quantity, onQuantityChange, onDelete}) {
          className="form-control form-control-sm text-center mx-2"
          style={{ width: "60px" }}
          onChange={handleChange}
-         value={quantity}
+         onBlur={handleBlur}
+         value={inputValue}
        />
       <button
         className="btn btn-outline-primary btn-sm"
