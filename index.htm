@@ -84,17 +84,7 @@ function CounterNav({itemId, quantity, onQuantityChange, onDelete}) {
 }
 
 function Card({name, price, rating, item, onAdd, onDelete, quantity, onQuantityChange}) {
-  const [showBar, setShowBar] = useState(false);
-
-  function openBar() {
-    setShowBar(true);
-    onAdd();
-  }
-
-  function closeBar() {
-    setShowBar(false);
-    onDelete();
-  }
+  const showBar = quantity>0;
 
   return (
     <div className="col">
@@ -109,11 +99,11 @@ function Card({name, price, rating, item, onAdd, onDelete, quantity, onQuantityC
               itemId={item.id}
               quantity={quantity}
               onQuantityChange={onQuantityChange}
-              onDelete={closeBar}
+              onDelete={onDelete}
             />
           ) : (
             <button
-              onClick={openBar}
+              onClick={onAdd}
               type="button"
               className="btn btn-success"
             >
@@ -171,7 +161,7 @@ function ItemList({items, cartItems, quantities, onAddItem, onDeleteItem, onQuan
             price={item.price}
             rating={item.rating}
             item={item}
-            quantity={quantities[item.id] || 1}
+            quantity={quantities[item.id] || 0}
             onAdd={() => onAddItem(item)}
             onDelete={() => onDeleteItem(item)}
             onQuantityChange={onQuantityChange}
