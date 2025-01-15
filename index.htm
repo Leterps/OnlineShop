@@ -142,7 +142,7 @@ function Card({name, price, rating, item, onAdd, onDelete, quantity, onQuantityC
   )
 }
 
-function CardShort({name, price, item, onDelete, quantity, onQuantityChange}) {
+function CardShort({name, price, item, onDelete, quantity, onQuantityChange, onSelect, isSelected}) {
 
   const totalPrice = price * quantity;
 
@@ -154,8 +154,8 @@ function CardShort({name, price, item, onDelete, quantity, onQuantityChange}) {
             <input
               className="form-check-input"
               type="checkbox"
-              value=""
-              id="flexCheckDefault"
+              checked={isSelected}
+              onChange={onSelect}
             />
           </div>
           <button
@@ -200,7 +200,10 @@ function ItemList({items, cartItems, quantities, onAddItem, onDeleteItem, onQuan
   )
 }
 
-function Cart({items, quantities, onDeleteItem, onQuantityChange}) {
+function Cart({items, quantities, onDeleteItem, onQuantityChange, onSelectItem, selectedItems, onSelectAll}) {
+
+ const allSelected = items.length > 0 && items.every(item => selectedItems.includes(item.id));
+
   return (
     <div className="col-2">
       <div className="p-3 border bg-light">
@@ -211,10 +214,17 @@ function Cart({items, quantities, onDeleteItem, onQuantityChange}) {
         <div className="d-grid gap-2 mt-2">
           <button type="button" className="btn btn-primary">Go to cart</button>
         </div>
-        <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-        <label className="form-check-label" htmlFor="flexCheckDefault">
-          Select all
-        </label>
+        <div className="form-check">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            checked={allSelected}
+            onChange={() => onSelectAll(!allSelected)}
+          />
+          <label className="form-check-label" htmlFor="flexCheckDefault">
+            Select all
+          </label>
+        </div>
         <div className="d-flex flex-column align-items-center">
           {items.map((item) => (
             <CardShort
@@ -223,8 +233,10 @@ function Cart({items, quantities, onDeleteItem, onQuantityChange}) {
               price={item.price}
               item={item}
               quantity={quantities[item.id] || 1}
-              onDelete={() => onDeleteItem(item)}
+              onSelect={() => onSelectItem(item)}
+              isSelected={selectedItems.includes(item.id)}
               onQuantityChange={onQuantityChange}
+              onDelete={() => onDeleteItem(item)}
             />
           ))}
         </div>
@@ -245,6 +257,7 @@ function MyApp() {
 
   const [cartItems, setCartItems] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [selectedItems, setSelectedItems] = useState ([]);
 
   function addItem(item) {
     if (!cartItems.some((cartItem) => cartItem.id === item.id)) {
@@ -266,6 +279,23 @@ function MyApp() {
     setQuantities(prev => ({...prev, [itemId]: newQuantity}));
   }
 
+  function selectItem(item) {
+    setSelectedItems(prev => {
+      if (prev.includes(item.id)) {
+        return prev.filter(id => id !== item.id);
+      }
+      return [...prev, item.id];
+    });
+  }
+
+  function handleSelectAll(selectAll) {
+      if (selectAll) {
+        setSelectedItems(cartItems.map(item => item.id));
+      } else {
+        setSelectedItems([]);
+      }
+    }
+
   return (
     <div className="row">
       <ItemList
@@ -278,6 +308,9 @@ function MyApp() {
       />
       <Cart
         items={cartItems}
+        selectedItems={selectedItems}
+        onSelectItem = {selectItem}
+        onSelectAll={handleSelectAll}
         quantities={quantities}
         onDeleteItem={deleteItem}
         onQuantityChange={updateQuantity}
