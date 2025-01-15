@@ -204,10 +204,18 @@ function Cart({items, quantities, onDeleteItem, onQuantityChange, onSelectItem, 
 
  const allSelected = items.length > 0 && items.every(item => selectedItems.includes(item.id));
 
+ const selectedSubtotal = items.reduce((sum, item) => {
+   if (selectedItems.includes(item.id)) {
+     const quantity = quantities[item.id] || 0;
+     return sum + (item.price * quantity);
+   }
+   return sum;
+ }, 0);
+
   return (
     <div className="col-2">
       <div className="p-3 border bg-light">
-        <p className="text-center"><strong>99,99</strong></p>
+        <p className="text-center"><strong>{selectedSubtotal.toFixed(2)}</strong></p>
         <div className="d-grid gap-2">
           <button type="button" className="btn btn-success">Go to checkout</button>
         </div>
