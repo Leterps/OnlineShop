@@ -200,13 +200,21 @@ function ItemList({items, cartItems, quantities, onAddItem, onDeleteItem, onQuan
   )
 }
 
-function Cart({items, quantities, onDeleteItem, onQuantityChange, onSelectItem, selectedItems, onSelectAll}) {
+function Cart({items, quantities, onDeleteItem, onQuantityChange, onSelectItem, selectedItems, onSelectAll, deleteAll}) {
+
+const showDeleteButton = items.length > 0;
 
  const allSelected = items.length > 0 && items.every(item => selectedItems.includes(item.id));
 
  const selectedSubtotal = items
      .filter(item => selectedItems.includes(item.id))
      .reduce((sum, item) => sum + (item.price * quantities[item.id]), 0);
+
+  function confirmAndDelete() {
+    if (confirm("Are you sure you want to delete these items?")) {
+         deleteAll();
+    }
+  }
 
   return (
     <div className="col-2">
@@ -218,6 +226,18 @@ function Cart({items, quantities, onDeleteItem, onQuantityChange, onSelectItem, 
         <div className="d-grid gap-2 mt-2">
           <button type="button" className="btn btn-primary">Go to cart</button>
         </div>
+        {showDeleteButton ? (
+        <div className="d-grid gap-2 mt-2">
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick = {confirmAndDelete}
+            >Delete all
+            </button>
+        </div>
+      ) : (
+        <div></div>
+      )}
         <div className="form-check">
           <input
             className="form-check-input"
@@ -279,6 +299,11 @@ function MyApp() {
     });
   }
 
+  function deleteAll () {
+    setCartItems([]);
+    setQuantities({});
+  }
+
   function updateQuantity(itemId, newQuantity) {
     setQuantities(prev => ({...prev, [itemId]: newQuantity}));
   }
@@ -318,6 +343,7 @@ function MyApp() {
         quantities={quantities}
         onDeleteItem={deleteItem}
         onQuantityChange={updateQuantity}
+        deleteAll = {deleteAll}
       />
     </div>
   )
