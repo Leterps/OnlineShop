@@ -204,13 +204,9 @@ function Cart({items, quantities, onDeleteItem, onQuantityChange, onSelectItem, 
 
  const allSelected = items.length > 0 && items.every(item => selectedItems.includes(item.id));
 
- const selectedSubtotal = items.reduce((sum, item) => {
-   if (selectedItems.includes(item.id)) {
-     const quantity = quantities[item.id] || 0;
-     return sum + (item.price * quantity);
-   }
-   return sum;
- }, 0);
+ const selectedSubtotal = items
+     .filter(item => selectedItems.includes(item.id))
+     .reduce((sum, item) => sum + (item.price * quantities[item.id]), 0);
 
   return (
     <div className="col-2">
